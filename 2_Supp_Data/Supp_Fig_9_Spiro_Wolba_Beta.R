@@ -1,9 +1,18 @@
+################################################################################
+################################################################################
+# Supp Figure Endosymbiomnts members beta-diversity
+################################################################################
+################################################################################
 
+
+###################
+## DATA AND CODE ##
+###################
 # Load data
 set.seed(19)
 N_min = 499
 betaM="bray"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/Supp_Fig_8_Spiroplasma_wolbachia_Beta.pdf"
+FigFileName = "Supp_Data_in_SM_doc/Supp_Fig_8_Spiroplasma_wolbachia_Beta.pdf"
 
 Spiro_samples = Info_depth %>% subset(depth_Spiro>N_min) %>% pull(sample_alias)
 Spiro_PS <- Spiro_PS %>% subset_samples(sample_alias %in% Spiro_samples)

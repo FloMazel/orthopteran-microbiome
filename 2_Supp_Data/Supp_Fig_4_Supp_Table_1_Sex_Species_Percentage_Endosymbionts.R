@@ -7,7 +7,7 @@
 ################################################################################
 
 Summary_Categ_Sample = Taxo_counts_Genus %>% 
-  mutate(Endosymbiont = if_else(Genus%in%endoS,"Endosymbiont","Gut symbiont")) %>% 
+  mutate(Endosymbiont = if_else(Genus=="Spiroplasma"|Order=="Rickettsiales"|Order=="Chlamydiales","Endosymbiont","Gut symbiont", missing="Gut symbiont")) %>% 
   group_by(Endosymbiont,Sample) %>% 
   summarise(RRC=sum(Abundance),Suborder=unique(suborder_host),Species=unique(host_scientific_name),Sex=unique(host_sex)) %>% 
   pivot_wider(names_from = Endosymbiont,values_from=RRC) %>% 
@@ -18,7 +18,7 @@ SexSpeciesSymbiont_plot = Summary_Categ_Sample %>%
   MyTheme + ylab("Relative read counts of endosymbionts")
 
 SexSpeciesSymbiont_plot
-ggsave("Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/Supp_Figure_SexSpeciesSymbiont_plot.pdf",SexSpeciesSymbiont_plot,device = 'pdf',
+ggsave("Supp_Data/Supp_Figure_SexSpeciesSymbiont_plot.pdf",SexSpeciesSymbiont_plot,device = 'pdf',
        width = 175,height =80  ,units="mm")
 
 
@@ -60,7 +60,7 @@ CaeliMod = anova(CaeliSp) %>% as_tibble(rownames = "Factor") %>%
 CaeliMod 
 
 
-pdf("Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/SuppTable_4.pdf")       # Export PDF
+pdf("Supp_Data/SuppTable_4.pdf")       # Export PDF
 grid.table(rbind(EnsiMod, CaeliMod))
 dev.off()
 

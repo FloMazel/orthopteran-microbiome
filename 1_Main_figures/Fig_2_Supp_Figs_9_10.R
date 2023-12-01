@@ -13,6 +13,8 @@
 ## DATA AND CODE ##
 ###################
 
+dir.create("Main_Figure")
+dir.create("Supp_Data_in_SM_doc")
 
 rm(list=ls())
 
@@ -23,10 +25,11 @@ library(MicEco)
 library(phyloseq)
 library(microbiome)
 library(magrittr)
+library(ggtext)
 
-source("Scripts/V_submitted/Public/0_Data_preparation/0_Util_fonctions.R")
-source("Scripts/V_submitted/Public/1_Main_figures/0_Functions_figures.R")
-source("Scripts/V_submitted/Public/0_Data_preparation/5_Load_Data.R")
+source("0_Data_preparation/0_Util_fonctions.R")
+source("1_Main_figures/0_Functions_figures.R")
+source("0_Data_preparation/5_Load_Data.R")
 
 # Rarefy data
 set.seed(19)
@@ -57,17 +60,22 @@ PhyloSeq_gut=gutB_PS_rarefied
 
 # Main figure (rarefied data + bray crutis)
 betaM="bray"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Main_Figure/Figure_2.pdf"
+
+FigFileName = "Main_Figure/Figure_2_bray.pdf" # create a 
 Specificity_figure_stats(gutB_PS_rarefied,endoS_PS_rarefied,betaM,FigFileName)
+
+PhyloSeq_gut=gutB_PS_rarefied
+PhyloSeq_endo=endoS_PS_rarefied
+
 
 # Supp Mat Jaccard (rarefied data + jaccard)
 betaM="jaccard"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data/Supp_Fig_10_JaccardRaref.pdf"
+FigFileName = "Supp_Fig_10_JaccardRaref.pdf"
 Specificity_figure_stats(gutB_PS_rarefied,endoS_PS_rarefied,betaM,FigFileName)
 
 # Supp Mat Aitchison
 betaM="Aitchison"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data/Supp_Fig_XX_AitchisonRaref.pdf"
+FigFileName = "Supp_Fig_XX_AitchisonRaref.pdf"
 Specificity_figure_stats(gutB_PS_rarefied,endoS_PS_rarefied,betaM,FigFileName)
 
 # Supp Mat Unifrac
@@ -77,12 +85,12 @@ Specificity_figure_stats(gutB_PS_rarefied,endoS_PS_rarefied,betaM,FigFileName)
 
 # Supp Mat Unifrac
 betaM="unifrac"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data/Supp_Fig_XX_UnifracRaref.pdf"
+FigFileName = "Supp_Fig_XX_UnifracRaref.pdf"
 Specificity_figure_stats(gutB_PS_rarefied,endoS_PS_rarefied,betaM,FigFileName)
 
 # Supp Mat Non Raref
 betaM="bray"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data/Supp_Fig_9_BrayNon_raref.pdf"
+FigFileName = "Supp_Fig_9_BrayNon_raref.pdf"
 
 endo_samples = Info_depth %>% subset(depth_endo>999) %>% pull(sample_alias)
 endoS_PS_rarefied <- endoS_PS %>% subset_samples(sample_alias %in% endo_samples)

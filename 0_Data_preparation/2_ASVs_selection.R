@@ -21,13 +21,9 @@ library(seqinr)
 library(vegan)
 
 # location of data on computer 
-path <- "/Users/fmazel/Data/Criquets/Raw_fastq_ENA/" # CHANGE ME to the directory containing the fastq files after unzipping
-
-# path for dada2 output
-path_dada2 = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/"
-
-# ref SILVA data path 
-silva_ref = "/Users/fmazel/Data/SILVA_16S/dada2_formated/silva_nr99_v138_train_set.fa.gz"
+path <- "" # CHANGE ME to the directory containing the fastq files after unzipping
+path_dada2 = "" # path for dada2 output
+silva_ref = "" # ref SILVA data path 
 
 # location of F and R reads on computer 
 fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names = TRUE))
@@ -71,16 +67,16 @@ errF <- learnErrors(filtFs, multithread=TRUE)
 errR <- learnErrors(filtRs, multithread=TRUE)
 plotErrors(errF, nominalQ=TRUE)
 
-saveRDS(object = errF,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/errModel_errF.Rdata")
-saveRDS(object = errR,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/errModel_errR.Rdata")
+saveRDS(object = errF,file = paste0(path_dada2,"errModel_errF.Rdata")
+saveRDS(object = errR,file = paste0(path_dada2,"errModel_errR.Rdata")
 
 # Sample inference
 dadaFs <- dada(filtFs, err=errF, multithread=TRUE)
 dadaRs <- dada(filtRs, err=errR, multithread=TRUE)
 head(dadaFs[[1]])
 
-saveRDS(object = dadaFs,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/ASV_infer_dadaFs.Rdata")
-saveRDS(object = dadaRs,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/ASV_infer_dadaRs.Rdata")
+saveRDS(object = dadaFs,file = paste0(path_dada2,"ASV_infer_dadaFs.Rdata")
+saveRDS(object = dadaRs,file = paste0(path_dada2,"ASV_infer_dadaRs.Rdata")
 
 
 #########################
@@ -90,7 +86,7 @@ saveRDS(object = dadaRs,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2
 # Merge reads
 mergers <- mergePairs(dadaFs, filtFs, dadaRs, filtRs, verbose=TRUE)
 head(mergers[[1]]) # Inspect the merger data.frame from the first sample
-saveRDS(object = mergers,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/mergers.Rdata")
+saveRDS(object = mergers,file = paste0(path_dada2,"mergers.Rdata")
 
 # construct table
 seqtab <- makeSequenceTable(mergers)
@@ -101,13 +97,13 @@ dim(seqtab) # 368 12127
 seqtab.nochim <- removeBimeraDenovo(seqtab, method="consensus", multithread=TRUE, verbose=TRUE)
 dim(seqtab.nochim) # 368 4915
 sum(seqtab.nochim)/sum(seqtab) #  0.8942331
-saveRDS(object = seqtab.nochim,file = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/seqtab.nochim.Rdata")
+saveRDS(object = seqtab.nochim,file = paste0(path_dada2,"seqtab.nochim.Rdata")
 
 getN <- function(x) sum(getUniques(x))
 track <- cbind(out, sapply(dadaFs, getN), sapply(dadaRs, getN), sapply(mergers, getN), rowSums(seqtab.nochim))
 colnames(track) <- c("input", "filtered", "denoisedF", "denoisedR", "merged", "nonchim")
 rownames(track) <- sample.names
-write.table(track, "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/track_reads_thru_dada2.txt", row.names = T)
+write.table(track, paste0(path_dada2,"track_reads_thru_dada2.txt", row.names = T)
 
 
 #########################
@@ -117,7 +113,7 @@ write.table(track, "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submis
 taxa138 <- assignTaxonomy(seqs=colnames(seqtab.nochim), refFasta=silva_ref, multithread=6, tryRC=T, minBoot = 60, outputBootstraps=T)
 tibble_taxa138 = as_tibble(taxa138[[1]])
 tibble_taxa138$seq=rownames(taxa138[[1]])
-write.table(tibble_taxa138 , "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/TaxoSILVA138_RDP.txt", sep="\t", quote=F)
+write.table(tibble_taxa138 , paste0(path_dada2,"TaxoSILVA138_RDP.txt", sep="\t", quote=F)
 
 
 #########################
@@ -180,11 +176,11 @@ dim(seqtab.nochim_selectedASVs_1000reads) #  336 1957
 export_taxonomy = final_taxonomy %>% 
   subset(seq %in% colnames(seqtab.nochim_selectedASVs_1000reads)) # 2053
 
-write.table(export_taxonomy,"/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/ASV_taxonomy_filtered.txt") # 2081 ASVs
+write.table(export_taxonomy,paste0(path_dada2,"ASV_taxonomy_filtered.txt") # 2081 ASVs
 write.fasta(sequences = as.list(export_taxonomy$seq),
             names = export_taxonomy$seq,
-            file.out = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/ASV_filtered.fasta")
+            file.out = paste0(path_dada2,"ASV_filtered.fasta")
 
 # ASVs tables 
-write.table(seqtab.nochim_selectedASVs_1000reads,"/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/seqtab.nochim_selectedASVs_1000reads.txt")
+write.table(seqtab.nochim_selectedASVs_1000reads,paste0(path_dada2,"seqtab.nochim_selectedASVs_1000reads.txt"))
 

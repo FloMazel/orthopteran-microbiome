@@ -1,3 +1,12 @@
+################################################################################
+################################################################################
+# Figure 3 on link betyeen éicorbioée betq-diversity and host phylogeny
+################################################################################
+################################################################################
+
+
+########## PREPARATION 
+
 rm(list=ls())
 
 # Load data
@@ -9,10 +18,10 @@ library(microbiome)
 library(magrittr)
 library(ape)
 
-source("Scripts/V3/0_Data_preparation/0_Util_fonctions.R")
-source("Scripts/V3/1_Main_figures/Functions_figures.R")
-source("Scripts/V3/0_Data_preparation/5_Load_Data.R")
-Host_Tree = read.tree("MyData/1_Important_Not_submitted_data/RAxML_bipartitions.result.31_tricked.newick")
+source("0_Data_preparation/0_Util_fonctions.R")
+source("0_Data_preparation/5_Load_Data.R")
+source("1_Main_figures/0_Functions_figures.R")
+Host_Tree = read.tree("3_Metadata/RAxML_bipartitions.result.31_tricked.newick")
 
 # Rarefy data
 set.seed(19)
@@ -29,21 +38,20 @@ gutB_PS_rarefied # 167 samples
 PhyloSeq_endo=endoS_PS_rarefied
 PhyloSeq_gut=gutB_PS_rarefied
 
+########## Choose data
+# Run one of the betq-diversity metric at a time 
+
 # beta 
 betaM="bray"
-exit_file="Redaction/Submission/ISMEcom_revision/Figure_3.pdf"
+exit_file="Figure_3.pdf"
 ylabT="Bray-curtis dissimilarity between host species"
 
-set.seed(19)
-N_raref = 1000
 betaM="unifrac"
-exit_file="Redaction/Submission/ISMEcom_revision/Supp_Data/SUpp_Fig_Mantel_Unifrac.pdf"
+exit_file="Supp_Data_in_SM_doc/SUpp_Fig_Mantel_Unifrac.pdf"
 ylabT="Unifrac dissimilarity between host species"
 
-set.seed(19)
-N_raref = 1000
 betaM="jaccard"
-exit_file="Redaction/Submission/ISMEcom_revision/Supp_Data/SUpp_Fig_Mantel_Jaccard.pdf"
+exit_file="Supp_Data_in_SM_doc/SUpp_Fig_Mantel_Jaccard.pdf"
 ylabT="Jaccard dissimilarity between host species"
 
 
@@ -55,6 +63,11 @@ ylabT="Jaccard dissimilarity between host species"
 sample_endo_unique=c("MEP2-E7","MEP3-D6","MEP4-G5","MEP1-D7") # to remove
 bray_PhyloSeq_endo  <- prune_samples(!PhyloSeq_endo@sam_data$sample_alias %in% sample_endo_unique,PhyloSeq_endo) %>% 
   phyloseq::distance(method = betaM)#, binary = T)
+
+if (betaM=="Aitchison"){
+  bray_PhyloSeq_endo  <- prune_samples(!PhyloSeq_endo@sam_data$sample_alias %in% sample_endo_unique,PhyloSeq_endo) %>% 
+    microbiome::transform("clr") %>% 
+    phyloseq::distance("euclidean")}
 
 MDS_bray_endoS_PS_rarefied <- bray_PhyloSeq_endo  %>% metaMDS() 
 MDS_data_bray_endoS_PS_rarefied <-  MDS_bray_endoS_PS_rarefied$points %>% as_tibble(rownames = "sample_alias") %>% 
@@ -100,7 +113,7 @@ mantel_test_endo$signif
 
 Mantel_plot_endo = reshaped_Beta_endo_speciesMean  %>% 
   subset(!Comparisons=="Same species") %>% 
-  ggplot(aes(y=Beta,x=Phy_dist)) + geom_point(alpha=.5,color="grey") +  MyTheme + ylim(.3,1)+
+  ggplot(aes(y=Beta,x=Phy_dist)) + geom_point(alpha=.5,color="grey") +  MyTheme + #ylim(.3,1)+
   geom_smooth(method="lm",color="black") + ggtitle("A. Endosymbiont community") +
   xlab("Phylogenetic distance between host species") + ylab(ylabT) + 
   annotate("text", x=.9, y=.6, size =P2/(72.27 / 25.4), label= paste0("Pearson r=",round(mantel_test_endo$statistic,3))) + 
@@ -117,8 +130,15 @@ Mantel_plot_endo
 # Prune samples  
 sample_gut_unique=c("MEP2-B7","MEP1-G7","MEP2-A4","MEP4-D12")# to remove
 
-bray_PhyloSeq_gut  <- prune_samples(!PhyloSeq_gut@sam_data$sample_alias %in% sample_endo_unique,PhyloSeq_gut) %>% 
+bray_PhyloSeq_gut  <- prune_samples(!PhyloSeq_gut@sam_data$sample_alias %in% sample_gut_unique,PhyloSeq_gut) %>% 
   phyloseq::distance(method = betaM)#, binary=T)
+
+if (betaM=="Aitchison"){
+  bray_PhyloSeq_gut  <- prune_samples(!PhyloSeq_gut@sam_data$sample_alias %in% sample_gut_unique,PhyloSeq_gut)  %>% 
+    microbiome::transform("clr") %>% 
+    phyloseq::distance("euclidean")}
+
+
 MDS_bray_gut_PS_rarefied <- bray_PhyloSeq_gut  %>% metaMDS() 
 MDS_data_bray_gut_PS_rarefied <-  MDS_bray_gut_PS_rarefied$points %>% as_tibble(rownames = "sample_alias") %>% 
   left_join(Info_depth)
@@ -145,6 +165,7 @@ reshaped_Beta_gut_speciesMean = reshaped_Beta_gut %>%
   group_by(host_scientific_name.x,host_scientific_name.y) %>% 
   summarise(Phy_dist=mean(Phy_dist),
             Beta=median(Beta),
+            n_compa_within_sp=n(),
             Comparisons=unique(Comparisons)) %>% 
   mutate(host_scientific_name.x=as.character(host_scientific_name.x),
          host_scientific_name.y=as.character(host_scientific_name.y))
@@ -163,11 +184,13 @@ mantel_test_gut$signif
 
 Mantel_plot_gut = reshaped_Beta_gut_speciesMean  %>% 
   subset(!Comparisons=="Same species") %>% 
-  ggplot(aes(y=Beta,x=Phy_dist)) + geom_point(alpha=.5,color="grey") +  MyTheme + ylim(.3,1)+
+  ggplot(aes(y=Beta,x=Phy_dist)) + geom_point(alpha=.5,color="grey") +  MyTheme + #ylim(.3,1)+
   geom_smooth(method="lm",color="black") + ggtitle("B. Putative gut symbiont community") +
   xlab("Phylogenetic distance between host species") + ylab(ylabT) + 
+  #annotate("text", x=.9, y=.6, size =P2/(72.27 / 25.4), label= paste0("Pearson r=",round(mantel_test_gut$statistic,3))) + 
+  #annotate("text", x=.9, y=.55, size =P2/(72.27 / 25.4),label= paste0("Mantel p=",mantel_test_gut$signif)) 
   annotate("text", x=.9, y=.6, size =P2/(72.27 / 25.4), label= paste0("Pearson r=",round(mantel_test_gut$statistic,3))) + 
-  annotate("text", x=.9, y=.55, size =P2/(72.27 / 25.4),label= paste0("Mantel p=",mantel_test_gut$signif)) 
+  annotate("text", x=.9, y=2, size =P2/(72.27 / 25.4),label= paste0("Mantel p=",mantel_test_gut$signif)) 
 
 Mantel_plot_gut
 

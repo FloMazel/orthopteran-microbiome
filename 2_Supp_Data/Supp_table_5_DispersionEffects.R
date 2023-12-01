@@ -1,6 +1,9 @@
 
 # Load data
-source("Scripts/3_Load_Data.R")
+source("0_Data_preparation/0_Util_fonctions.R")
+source("/1_Main_figures/0_Functions_figures.R")
+source("/0_Data_preparation/5_Load_Data.R")
+
 library(gridExtra)
 
 
@@ -143,7 +146,7 @@ sample_gut_unique=c("MEP2-B7","MEP1-G7","MEP2-A4","MEP4-D12")# to remove
   Permanova_res_gut <- do.call(rbind,Permanova_resG) %>% 
     group_by(Predictor) %>% 
     select(-rep) %>% 
-    summarise_if(is.numeric, median, na.rm = TRUE)   %>% mutate(Symbiont="Putattive gut symbiont")
+    summarise_if(is.numeric, median, na.rm = TRUE)   %>% mutate(Symbiont="Putative gut symbiont")
   
   Permanova_res_gut 
   
@@ -152,7 +155,7 @@ sample_gut_unique=c("MEP2-B7","MEP1-G7","MEP2-A4","MEP4-D12")# to remove
     mutate_if(is.numeric,round,3)
   
 
-pdf("Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/SuppTable_Balanced_Permanova.pdf")       # Export PDF
+pdf("Supp_Data_in_SM_doc/SuppTable_Balanced_Permanova.pdf")       # Export PDF
 grid.table(final)
 dev.off()
   

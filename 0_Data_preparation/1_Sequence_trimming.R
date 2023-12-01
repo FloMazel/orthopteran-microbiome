@@ -16,11 +16,11 @@
 #load library
 library(dada2); packageVersion("dada2")
 library(tidyverse)
-cutadapt <- "/Users/fmazel/Softwares/ls/envs/cutdapt_env/bin/cutadapt" # path to cutadapt on the computer 
+cutadapt <- "" # path to cutadapt on the computer 
 
 
 # location of data on computer 
-path <- "/Users/fmazel/Data/Criquets/p419_run191016_16S_RawData_Results_Reports/p419_run191016_16S_raw_data/a_data/gz" # CHANGE ME to the directory containing the fastq files after unzipping.
+path <- "" # CHANGE ME to the directory containing the fastq files after unzipping.
 
 # location of F and R reads on computer 
 fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names = TRUE))
@@ -32,7 +32,7 @@ reads_path = tibble(ForwardReadsPath = fnFs,
                     ForwardReadsName = sort(list.files(path, pattern="_R1_001.fastq", full.names = F)),
                     ReverseReadsName = sort(list.files(path, pattern="_R2_001.fastq", full.names = F)))
 
-path_to_trimmed_reads = "/Users/fmazel/Data/Criquets/MyWork/TrimmedRawReads_error_Submitted/"
+path_to_trimmed_reads = "" # path of trimmed reads on your computer 
 
 reads_path = reads_path %>% 
   mutate(Trimmed_ForwardReadsPath = paste0(path_to_trimmed_reads,ForwardReadsName),

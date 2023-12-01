@@ -1,22 +1,38 @@
+################################################################################
+################################################################################
+# FSup Table 1
+################################################################################
+################################################################################
+
+
+###################
+## DATA AND CODE ##
+###################
+
+
 # Packages 
 library(tidyverse)
 library(proj4)
 library(gridExtra)
 library(xlsx)
 
+# get a map of the region
+library(ggmap)
+library(ggsn)
+
 # Tally table for species, site, sex. 
-phyloseq_obj = readRDS("MyData/1_Important_Not_submitted_data/Phyloseq_object.RDS")
+phyloseq_obj = readRDS("Phyloseq_object.RDS")
 metaD = as(sample_data(phyloseq_obj), "data.frame")
 
 tally_table = metaD %>% group_by(host_scientific_name,host_sex,sample_site_ID) %>% 
   summarise(n_samples = n())
 
-write_csv(x = tally_table,file = "MyData/1_Important_Not_submitted_data/Tally_table_sampling.csv")
+write_csv(x = tally_table,file = "Tally_table_sampling.csv")
 
 # S
 
 # Plot_info
-plot_info <- read.table("MyData/1_site.info.txt",header = T) %>% 
+plot_info <- read.table("3_Metadata/1_site.info.txt",header = T) %>% 
   select(-Elevation_category)
 
 # Projection
@@ -27,14 +43,14 @@ pj <- project(select(plot_info,Coordinates.E,Coordinates.N), proj4string, invers
 plot_info$Lat=pj$y; plot_info$Long=pj$x
 
 #Export Table
-pdf("Redaction/V2/Supp_figures/SuppTable_1_Sites_info.pdf",height = 5,width = 10)       # Export PDF
+pdf("Supp_figures/SuppTable_1_Sites_info.pdf",height = 5,width = 10)       # Export PDF
 grid.table(plot_info)
 dev.off()
 
 
 
 # Species and Site infos 
-sample_info <-  read.table("MyData/Microbiome_error1/sample_info.txt") 
+sample_info <-  read.table("sample_info.txt") 
 
 Site_species_Summary <- sample_info  %>%  
   group_by(Species,Site) %>% 
@@ -49,9 +65,7 @@ Site_species_plot <- Site_species_Summary  %>%
 
 Site_species_plot
 
-# get a map of the region
-library(ggmap)
-library(ggsn)
+
 
 mapImageData1 <- get_map(location = c(left = .99*min(plot_info$Long),
                                       right = 1.01*max(plot_info$Long),
@@ -81,7 +95,7 @@ fig_sites = plot_grid(Site_species_plot,map_sites,
                  ncol=1)
 fig_sites
 
-ggsave(filename = "Redaction/V2/Supp_figures/Supp_Fig_1_Sites.pdf",fig_sites,device = "pdf",
+ggsave(filename = "Supp_figures/Supp_Fig_1_Sites.pdf",fig_sites,device = "pdf",
        width = 175,height =310  ,units="mm")
 
 

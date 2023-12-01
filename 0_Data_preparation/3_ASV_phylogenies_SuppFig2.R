@@ -5,6 +5,8 @@ library(tidyverse)
 library(genbankr)
 library(ggtree)
 
+path_dada2 = "" # path for dada2 output
+
 # This script is used to build a phylogeny for 1/all ASVs using fastTree and 2/Wolbachia ASVs suign a mroe refined algorithm 
 
 ##################################
@@ -14,16 +16,18 @@ library(ggtree)
 ##################################
 
 #align sequences
-cd /Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/
-mafft ASV_filtered.fasta > ASV_filtered_aligned.fasta # v7.490
+# to run on the terminal 
+"cd /Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/"
+"mafft ASV_filtered.fasta > ASV_filtered_aligned.fasta # v7.490"
 
-aligned = read.fasta( "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/ASV_filtered_aligned.fasta")
+aligned = read.fasta( paste0(path_dada2,"ASV_filtered_aligned.fasta")
 write.fasta(sequences = as.list(aligned),
             names = export_taxonomy$seq, #eport taxonomy files from "2_ASVs_selection.R" script
-            file.out = "/Users/fmazel/Data/Criquets/Processed_data/dada2_data_submission/ASV_filtered_aligned.fasta")
+            file.out = paste0(path_dada2,"ASV_filtered_aligned.fasta")
 
 # Reconstruct Fast Tree V2.1.11 
-FastTree -gtr -nt ASV_filtered_aligned.fasta > ASV_filtered_aligned.tree # to run on the terminal 
+# to run on the terminal 
+"FastTree -gtr -nt ASV_filtered_aligned.fasta > ASV_filtered_aligned.tree" # to run on the terminal 
 
 
 ##################################
@@ -31,8 +35,9 @@ FastTree -gtr -nt ASV_filtered_aligned.fasta > ASV_filtered_aligned.tree # to ru
 #     2/ WOLBACHIA PHYLOGENY        #
 ##################################
 ##################################
-meta_backBone = read.table(file = "MyData/WolbachiaGenome/Centenial_reviewList/Centennial_review_Metadata.txt",sep = "\t",header = T) %>% 
-  mutate(Seq_ID=NCBIAccession)
+meta_backBone = read.table(file = "Centennial_review_Metadata.txt",sep = "\t",header = T) %>% 
+  mutate(Seq_ID=NCBIAccession) 
+# to download from Kaur R, Shropshire JD, Cross KL, Leigh B, Mansueto AJ, Stewart V, et al. Living in the endosymbiotic world of Wolbachia: A centennial review. Cell Host Microbe 2021; 29: 879–893. 
 
 
 ##########################
@@ -40,7 +45,7 @@ meta_backBone = read.table(file = "MyData/WolbachiaGenome/Centenial_reviewList/C
 ##########################
 
 # Non circular Genome metadata (link seq ID to assembly ID)
-path_to_master_assembly_project = "MyData/WolbachiaGenome/Centenial_reviewList/genome_assemblies_wgs_gbff/ncbi-genomes-2022-09-29/"
+path_to_master_assembly_project = "" # tath were genoées from above ref were downloaded
 master_assembly_list = tibble(assembly_name = list.files(path_to_master_assembly_project)) %>% 
   separate(assembly_name,sep = "_",into=c(NA,"GCA","ASN",NA),remove = F) %>% 
   mutate(GCA_name = paste0("GCA_",GCA),
@@ -79,10 +84,10 @@ for (i in 1:dim(download_list)[1]){
               file.out = paste0(download_list$fasta_file_path[i],".fa")) }
 
 # Concatenate all genomes 
-cat Genomes/*.fna.gz.fa > all_Wolbachia.fna
+"cat Genomes/*.fna.gz.fa > all_Wolbachia.fna" # to run on the terminal 
 
 # Extract rRNA from representative set of Wolbachia
-barrnap --outseq all_Wolbachia_rRNA.fasta all_Wolbachia.fna
+"barrnap --outseq all_Wolbachia_rRNA.fasta all_Wolbachia.fna" # to run on the terminal 
 
 # Retrieve 16S only 
 rRNA <- "MyData/WolbachiaGenome/Centenial_reviewList/ncbi-genomes-2022-09-23/all_Wolbachia_rRNA.fasta"
@@ -98,10 +103,12 @@ write.fasta(sequences = seqs16S,names = names(seqs16S),file.out = p16S)
 
 
 # Align
-mafft all_Wolbachia_16S.fasta > all_Wolbachia_16S_aligned.fasta
+# to run on the terminal 
+"mafft all_Wolbachia_16S.fasta > all_Wolbachia_16S_aligned.fasta"
 
 # Build tree (IQtree)
-iqtree -s all_Wolbachia_16S_aligned.fasta -m TEST -bb 1000 -alrt 1000 -nt AUTO
+# to run on the terminal 
+"iqtree -s all_Wolbachia_16S_aligned.fasta -m TEST -bb 1000 -alrt 1000 -nt AUTO"
 
 # Check bakcbone trees
 BackBone = read.tree("MyData/WolbachiaGenome/Centenial_reviewList/all_Wolbachia_16S_aligned.fasta.treefile")
@@ -138,10 +145,6 @@ p = p %<+% tips +
               label.padding = unit(0.15, "lines"), # amount of padding around the labels
               label.size = 0)  # size of label border
 
-ggsave(filename = "Redaction/V1/Supp_figures/Wolbchia_BackBone_tree.pdf",plot = p, device = "pdf",height = 14,width = 14)
-#write.tree(BackBone,"MyData/WolbachiaGenome/Centenial_reviewList/Review_Genomes_retreived_16S_aligned.fasta_CleanTIP_name.tre")
-
-
 ##########################
 # ADD V4 AMPLICON DATA   #
 ##########################
@@ -149,7 +152,7 @@ ggsave(filename = "Redaction/V1/Supp_figures/Wolbchia_BackBone_tree.pdf",plot = 
 # add fragments to the alignment
 Fasta_Wolbachia = "MyData/WolbachiaGenome/Centenial_reviewList/Wolbachia_sequences.fa"
 
-Taxonomy <- read.table("MyData/Microbiome_error1/ASV_taxonomy.txt")
+Taxonomy <- read.table("ASV_taxonomy.txt")
 Wolba =  Taxonomy %>%
   subset(Genus=="Wolbachia")
 
@@ -158,20 +161,19 @@ write.fasta(as.list(revComp),names=paste0("Wolba_ASV_",1:length(Wolba$seq)),file
 Wolba = Wolba %>% 
   mutate(namesPhylo=paste0("Wolba_ASV_",1:length(Wolba$seq)))
 
-Wolba$seq
+
 
 # align Amplicon to template 
-mafft --keeplength --addfragments Wolbachia_sequences.fa all_Wolbachia_16S_aligned.fasta > Wolbachia_sequences_aligned_CentenialR.fa
+# to run on the terminal 
+"mafft --keeplength --addfragments Wolbachia_sequences.fa all_Wolbachia_16S_aligned.fasta > Wolbachia_sequences_aligned_CentenialR.fa"
 
 # Build tree (IQtree) with constrain 
-iqtree -s Wolbachia_sequences_aligned_CentenialR.fa -m TEST -bb 1000 -alrt 1000 -nt AUTO -g all_Wolbachia_16S_aligned.fasta.treefile
+# to run on the terminal 
+"iqtree -s Wolbachia_sequences_aligned_CentenialR.fa -m TEST -bb 1000 -alrt 1000 -nt AUTO -g all_Wolbachia_16S_aligned.fasta.treefile"
 
 # collapse unsupported nodes
-iqtree -t Wolbachia_sequences_aligned_CentenialR.fa.treefile -minsupnew 90/95
-
-#tips = tips %>% 
-#  select(GCA_name,raw_tips,Supergroup) #%>% 
-#group_by(GCA_name) %>% sample_n(1) # keep only one 16S copy per genome 
+# to run on the terminal 
+"iqtree -t Wolbachia_sequences_aligned_CentenialR.fa.treefile -minsupnew 90/95"
 
 # Check Full Tree
 FullTree = read.tree("MyData/WolbachiaGenome/Centenial_reviewList/Wolbachia_sequences_aligned_CentenialR.fa.treefile.collapsed")
@@ -183,17 +185,17 @@ tips_full = tibble(raw_tips=FullTree$tip.label) %>%
   left_join(tips) %>% 
   mutate(Group=if_else(is.na(Supergroup),"ASVs",Supergroup))
 
+(BackBone,tips$raw_tips)
+= tips$GCA_name[match(BackBone$tip.label,tips$raw_tips)]
 
-#BackBone = keep.tip(BackBone,tips$raw_tips)
-#BackBone$tip.label = tips$GCA_name[match(BackBone$tip.label,tips$raw_tips)]
-#plot(BackBone)
-
+##############################
+#      Supp. Figure 2
+##############################
 p = ggtree(FullTree)
 p = p %<+% tips_full + 
   geom_tippoint(aes(color = factor(Group)))  # size of label border
 p
-ggsave(filename = "Redaction/V1/Supp_figures/Wolbchia_Full_tree.pdf",plot = p, device = "pdf",height = 15,width = 10,limitsize = FALSE)
-
+ggsave(filename = "Supp_figures/Wolbchia_Full_tree.pdf",plot = p, device = "pdf",height = 15,width = 10,limitsize = FALSE)
 
 # get only ASV tree
 FullTreeNoC = read.tree("MyData/WolbachiaGenome/Centenial_reviewList/Wolbachia_sequences_aligned_CentenialR.fa.treefile")

@@ -19,10 +19,10 @@ library(gridExtra)
 library(tidyverse)
 library(phyloseq)
 
-source("Scripts/V_submitted/Public/0_Data_preparation/5_Load_Data.R")
+source("0_Data_preparation/5_Load_Data.R")
 
-ensifera_image <- svgparser::read_svg("Redaction/PhyloPic.8f55e2ec.Birgit-Lang.Ensifera.svg")
-caelifera_image <- svgparser::read_svg("Redaction/PhyloPic.7c142ec5.Birgit-Lang.Caelifera.svg")
+ensifera_image <- svgparser::read_svg("3_Metadata/PhyloPic.8f55e2ec.Birgit-Lang.Ensifera.svg")
+caelifera_image <- svgparser::read_svg("3_Metadata/PhyloPic.7c142ec5.Birgit-Lang.Caelifera.svg")
 # Copyright 
 # Caelifera http://phylopic.org/image/7c142ec5-aebb-495d-80fa-1b575090d5db/
 # Ensifera http://phylopic.org/image/8f55e2ec-f2ea-407a-bfbf-077aa10b5d36/
@@ -42,7 +42,7 @@ Taxo_counts_Genus <- phyloseq_obj %>%
   psmelt()
 
 Summary_Genus = Taxo_counts_Genus %>% 
-  mutate(Endosymbiont = if_else(Genus%in%endoS,"Endosymbiont","Gut symbiont")) %>% 
+  mutate(Endosymbiont = if_else(Genus=="Spiroplasma"|Order=="Rickettsiales"|Order=="Chlamydiales","Endosymbiont","Gut symbiont", missing="Gut symbiont")) %>% 
   group_by(Endosymbiont) %>% 
   summarise(Sum_RelAb_bySample=sum(Abundance)/336)
 
@@ -51,6 +51,7 @@ Summary_Fam = Taxo_counts_Genus %>%
   summarise(Sum_RelAb_bySample=sum(Abundance)/336)
 
 #
+
 
 
 # Plot relative proportions 
@@ -80,7 +81,7 @@ legend <- cowplot::get_legend(Fig1A)
 Fig1A  <- Fig1A  + theme(legend.position="none")
 Fig1A
 
-#ggsave(Fig1A,filename = "Redaction/V1/Main_Figure/Fig1A.pdf", ,device = 'pdf', width = 60,height =60  ,units="mm")
+#ggsave(Fig1A,filename = "Redaction/Submission/ISMEcom_revision2/Main_Figure/Fig1A.pdf", ,device = 'pdf', width = 60,height =60  ,units="mm")
 
 ###################
 ##    Fig 1BC    ##
@@ -94,7 +95,7 @@ Fig1Theme = theme(axis.title.x = element_text(vjust=VadjustX),
                   axis.line = element_blank())
 
 Summary_Endo_perSample = Taxo_counts_Genus %>% 
-  mutate(Endosymbiont = if_else(Genus%in%endoS,"Endosymbiont","Gut symbiont")) %>% 
+  mutate(Endosymbiont = if_else(Genus=="Spiroplasma"|Order=="Rickettsiales"|Order=="Chlamydiales","Endosymbiont","Gut symbiont", missing="Gut symbiont"))  %>% 
   group_by(Endosymbiont,Sample) %>% 
   summarise(Abundance=sum(Abundance),
   Suborder=unique(suborder_host)) 
@@ -139,8 +140,8 @@ fig1 = plot_grid(fig1top,legend,
 
 fig1
 
-#ggsave("Redaction/Submission/ISMEcom_revision/Fig_1.pdf",fig1,device = 'pdf',
-#       width = 175,height =80  ,units="mm")
+ggsave("Fig_1.pdf",fig1,device = 'pdf',
+       width = 175,height =80  ,units="mm")
 
 
 ###################
@@ -148,7 +149,7 @@ fig1
 ###################
 
 Summary_Categ_Sample = Taxo_counts_Genus %>% 
-  mutate(Endosymbiont = if_else(Genus%in%endoS,"Endosymbiont","Gut symbiont")) %>% 
+  mutate(Endosymbiont = if_else(Genus=="Spiroplasma"|Order=="Rickettsiales"|Order=="Chlamydiales","Endosymbiont","Gut symbiont", missing="Gut symbiont")) %>% 
   group_by(Endosymbiont,Sample) %>% 
   summarise(RRC=sum(Abundance),Suborder=unique(suborder_host),Species=unique(host_scientific_name),Sex=unique(host_sex),Elevation=mean(Elevation)) %>% 
   pivot_wider(names_from = Endosymbiont,values_from=RRC) %>% 
@@ -161,12 +162,13 @@ Summary_Categ_Sample %>%
   group_by(Suborder) %>% 
   summarise(mean(Endosymbiont),sd(Endosymbiont))
 
-#  Suborder  `mean(Endosymbiont)` `sd(Endosymbiont)`
-#1 Caelifera                0.814              0.271
-#2 Ensifera                 0.155              0.277
+# A tibble: 2 × 3
+#Suborder  `mean(Endosymbiont)` `sd(Endosymbiont)`
+#<chr>                    <dbl>              <dbl>
+#  1 Caelifera                0.845              0.267
+#2 Ensifera                 0.197              0.302
 
 # Some basics stats on prevalence of endoS
-
 
 Summary_EndoS_Sample = Taxo_counts_Genus %>% 
   group_by(Genus,Sample) %>% 
@@ -182,5 +184,5 @@ Summary_EndoS_Sample %>%
 
 # Some stats 
 kruskal.test(Summary_Categ_Sample$Endosymbiont,Summary_Categ_Sample$Suborder)
-#Kruskal-Wallis chi-squared = 136.41, df = 1, p-value < 2.2e-16
+#Kruskal-Wallis chi-squared = 132.36, df = 1, p-value < 2.2e-16
 

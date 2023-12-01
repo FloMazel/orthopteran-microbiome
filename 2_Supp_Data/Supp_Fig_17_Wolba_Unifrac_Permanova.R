@@ -4,7 +4,7 @@ library(tidyverse)
 
 Wolba_PS
 
-wolba_phylo = read.tree("MyData/Microbiome_error1/Wolbachia_ASV.tre")
+wolba_phylo = read.tree("Wolbachia_ASV.tre")
 wolba_phylo
 
 Wolba =  Taxonomy %>%

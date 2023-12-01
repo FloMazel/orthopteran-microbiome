@@ -10,14 +10,15 @@ library(phyloseq)
 library(microbiome)
 library(magrittr)
 
-source("Scripts/V_submitted/Public/0_Data_preparation/0_Util_fonctions.R")
-source("Scripts/V_submitted/Public/1_Main_figures/0_Functions_figures.R")
-source("Scripts/V_submitted/Public//0_Data_preparation/5_Load_Data.R")
+source("0_Data_preparation/0_Util_fonctions.R")
+source("1_Main_figures/0_Functions_figures.R")
+source("0_Data_preparation/5_Load_Data.R")
 
 # Rarefy data
 set.seed(19)
 N_raref = 1000
 
+endoS_PS
 endoS_PS_rarefied <- endoS_PS %>% 
   rarefy_even_depth(N_raref)
 endoS_PS_rarefied #259 samples
@@ -32,7 +33,7 @@ PhyloSeq_gut=gutB_PS_rarefied
 permanova_plot = list()
 
 # Main figure 
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data/Constranied_permanova_plot.pdf"
+FigFileName = "Supp_Data_in_SM_doc/Constranied_permanova_plot.pdf"
 
 for (betaM in c("bray","jaccard","Aitchison","unifrac")) {
 ################################
@@ -127,7 +128,7 @@ for (betaM in c("bray","jaccard","Aitchison","unifrac")) {
   Permanova_res = unnest(model_gutCONSTRAINED2) %>% 
     subset(!is.na(F)) %>% 
     mutate(Predictor=c("Host species","Sex"),
-           Symbiont = rep("Gut symbiont",2)) %>% 
+           Symbiont = rep("Putative gut symbiont",2)) %>% 
     mutate(Signif = ifelse(`Pr(>F)`>.05,"",ifelse(`Pr(>F)`>.01,"*",'**')))
   
   Permanova_res2 = unnest(model_endoCONSTRAINED2) %>% 

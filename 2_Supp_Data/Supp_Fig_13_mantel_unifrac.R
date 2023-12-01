@@ -1,10 +1,21 @@
+################################################################################
+################################################################################
+# Supp Figure MANTEL UNIFRAC
+################################################################################
+################################################################################
+
+
+###################
+## DATA AND CODE ##
+###################
+
 library(ape)
 
-source("Scripts/3_Load_Data.R")
+source("/0_Data_preparation/5_Load_Data.R")
 
 # Host Tree
-Host_Tree = read.tree("MyData/Host/RAxML_bipartitions.result.31_tricked.newick")
-Pruned_Tree = keep.tip(phy = Host_Tree,tip = intersect(unique(Info_depth$Species),Host_Tree$tip.label))
+Host_Tree = read.tree("MyData/1_Important_Not_submitted_data/RAxML_bipartitions.result.31_tricked.newick")
+Pruned_Tree = keep.tip(phy = Host_Tree,tip = intersect(unique(Info_depth$host_scientific_name),Host_Tree$tip.label))
 Pruned_Tree # 21 host 
 PhyDist=cophenetic(Pruned_Tree)
 reshaped_D_phy=as.data.frame(melt(as.matrix(PhyDist),varnames = c("Species.x","Species.y"))) %>% 
@@ -22,6 +33,11 @@ wolba_phylo = read.tree("MyData/Microbiome_error1/Wolbachia_ASV.tre")
 wolba_phylo
 
 wolba_phylo$tip.label = Wolba$seq[match(wolba_phylo$tip.label,Wolba$namesPhylo)]
+
+
+###################
+##    Figure     ##
+###################
 
 # Distributiob data 
 N_min = 499
@@ -74,6 +90,6 @@ Mantel_plot_endo = reshaped_Beta_endo_speciesMean  %>%
 
 Mantel_plot_endo
 
-ggsave(plot = Mantel_plot_endo ,filename = "Redaction/V1/Supp_figures/Mantel_wUnifravc_Wolbachia.pdf",device="pdf",height = 80,width = 80,units="mm")
+ggsave(plot = Mantel_plot_endo ,filename = "Supp_figures/Mantel_wUnifravc_Wolbachia.pdf",device="pdf",height = 80,width = 80,units="mm")
 
 

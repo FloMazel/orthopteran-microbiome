@@ -8,8 +8,9 @@ library(phyloseq)
 library(microbiome)
 library(magrittr)
 
-source("Scripts/V_submitted/Public/0_Data_preparation/0_Util_fonctions.R")
-source("Scripts/V_submitted/Public/0_Data_preparation/5_Load_Data.R")
+source("0_Data_preparation/0_Util_fonctions.R")
+source("1_Main_figures/0_Functions_figures.R")
+source("0_Data_preparation/5_Load_Data.R")
 #library(tidyterra)
 
 #tally table elevation 
@@ -32,10 +33,10 @@ gutB_PS_rarefied <-  gutB_PS %>%
 
 # Define metric and corresponding output 
 betaM="bray"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/Altitude_supp_fig_Bray.pdf"
+FigFileName = "Supp_Data_in_SM_doc/Altitude_supp_fig_Bray.pdf"
 
 betaM="Aitchison"
-FigFileName = "Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/Altitude_supp_fig_Aitchison.pdf"
+FigFileName = "Supp_Data_in_SM_doc/Altitude_supp_fig_Aitchison.pdf"
 
 export_plot = list()
 # Species focused on 
@@ -65,7 +66,7 @@ meta_gut_rarefied = as_tibble(phyloseq::sample_data(gutB_PS_rarefied_oneSpecies)
 gut_tally = meta_gut_rarefied %>% 
   group_by(host_scientific_name, Elevation) %>% 
   summarise(n=n()) %>% 
-  mutate(data="Gut symbiont")
+  mutate(data="Putative gut symbiont")
 
 endo_tally = meta_endo_rarefied %>% 
   group_by(host_scientific_name, Elevation) %>% 

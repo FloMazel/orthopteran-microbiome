@@ -1,12 +1,26 @@
+################################################################################
+################################################################################
+#   Supp figure on alpha diversity
+################################################################################
+################################################################################
+
+
+###################
+## DATA AND CODE ##
+###################
+
+
+rm(list=ls())
+
 library(cowplot)
 library(vegan)
 library(tidyverse)
 library(phyloseq)
 
+
 endoS=c("Spiroplasma","Wolbachia")
 cols=c('Endosymbiont'="#FFD92F",'Gut symbiont'="#6ab41f")
-
-source("Scripts/V_submitted/Public/0_Data_preparation/5_Load_Data.R")
+source("0_Data_preparation/5_Load_Data.R")
 
 
 # Richness estimates
@@ -48,7 +62,7 @@ alpha_plot = plot_grid(Gut_Alpha_Plot,
           Spiro_Alpha_Plot,
           align = "h",ncol=1)
 
-ggsave("Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/Suop_fig_5_alpha_plot.pdf",alpha_plot,device = 'pdf',
+ggsave("Supp_Data_in_SM_doc/Suop_fig_5_alpha_plot.pdf",alpha_plot,device = 'pdf',
        width = 175,height =300  ,units="mm")
 
 # Get some estimates of mean richness 
@@ -102,7 +116,7 @@ domainant_plot = plot_grid(Wolba,
 
 domainant_plot
 
-ggsave("Redaction/Submission/ISMEcom_revision/Supp_Data_in_SM_doc/Supp_Fig6_dominantEndoS.pdf",domainant_plot,device = 'pdf',
+ggsave("Supp_Data_in_SM_doc/Supp_Fig6_dominantEndoS.pdf",domainant_plot,device = 'pdf',
        width = 175,height =80  ,units="mm")
 
 
