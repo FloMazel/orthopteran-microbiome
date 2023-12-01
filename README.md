@@ -1,4 +1,4 @@
-# Orthopteran-microbiome
+# orthopteran-microbiome
 
 This code is used in the paper entitled "Contrasted host specificity of gut and endosymbiont bacterial communities in alpine grasshoppers and crickets" by
 Mazel, Florent1,*
