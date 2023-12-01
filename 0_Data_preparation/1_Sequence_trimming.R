@@ -21,6 +21,8 @@ cutadapt <- "" # path to cutadapt on the computer
 
 # location of data on computer 
 path <- "" # CHANGE ME to the directory containing the fastq files after unzipping.
+# All DNA data are available online 
+# (microbiome data on ENA: PRJEB62030, host data on figshare: DOI: 10.6084/m9.figshare.23605404).
 
 # location of F and R reads on computer 
 fnFs <- sort(list.files(path, pattern="_R1_001.fastq", full.names = TRUE))

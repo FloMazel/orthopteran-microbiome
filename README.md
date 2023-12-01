@@ -20,3 +20,5 @@ Pellissier, Loïc4,5, **
 **Summary**:  In essence, it uses 16S amplicon sequences and metadata as input and provide an analysis of host specificity and phylosymbiosis across endosymbionts and putative gut symbionts
 
 **Code** It fountains mostly R code, and some bash code to run softwares such as IQTREE, barnapp or mafft
+
+**Data** Metadata is provided here and will be also available on the website of the published upon publication.  All DNA data are available online (microbiome data on ENA: PRJEB62030, host data on figshare: DOI: 10.6084/m9.figshare.23605404).
